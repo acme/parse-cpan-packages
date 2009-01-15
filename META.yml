@@ -1,0 +1,18 @@
+--- #YAML:1.0
+name:                Parse-CPAN-Packages
+version:             2.29
+abstract:            ~
+license:             perl
+author:              
+    - Leon Brocard <acme@astray.com>
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+    Class::Accessor::Fast:         0
+    CPAN::DistnameInfo:            0
+    IO::Zlib:                      0
+    Test::More:                    0
+    version:                       0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3
