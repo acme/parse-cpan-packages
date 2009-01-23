@@ -85,7 +85,7 @@ DESCRIPTION
           my $p = Parse::CPAN::Distribution->new($gzfilename);
           my $dist = $p->distribution('L/LB/LBROCARD/Acme-Colour-1.00.tar.gz');
 
-    distrbutions()
+    distributions()
         Returns a list of Parse::CPAN::Distribution objects representing all
         the known distributions.
 
@@ -107,6 +107,20 @@ DESCRIPTION
 
     latest_distribution_count()
         Returns the number of distributions stored.
+
+  Preamble Methods
+    These methods return the information from the preamble at the start of
+    the file. They return undef if for any reason no matching preamble line
+    was found.
+
+    file()
+    url()
+    description()
+    columns()
+    intended_for()
+    written_by()
+    line_count()
+    last_updated()
 
   Addtional Methods
     These are additional methods that you may find useful.
@@ -138,8 +152,9 @@ AUTHOR
     Leon Brocard <acme@astray.com>
 
 COPYRIGHT
-    Copyright (C) 2004, Leon Brocard
+    Copyright (C) 2004-9, Leon Brocard
 
+LICENSE
     This module is free software; you can redistribute it or modify it under
     the same terms as Perl itself.
 
