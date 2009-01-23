@@ -23,3 +23,23 @@ sub add_package {
 }
 
 1;
+
+__END__
+
+=head1 NAME
+
+Parse::CPAN::Packages::Distribution
+
+=head1 DESCRIPTION
+
+Represents a CPAN distribution.
+
+=head1 METHODS
+
+=head2 contains
+
+Returns the packages in the distribution.
+
+=head2 add_package
+
+Adds a package to the distribution.

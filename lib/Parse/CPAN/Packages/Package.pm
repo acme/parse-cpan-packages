@@ -10,3 +10,13 @@ has 'distribution' =>
 __PACKAGE__->meta->make_immutable;
 
 1;
+
+__END__
+
+=head1 NAME
+
+Parse::CPAN::Packages::Package
+
+=head1 DESCRIPTION
+
+Represents a CPAN Package.

@@ -414,8 +414,18 @@ automatically.)
 =item add_distribution($distribution_obj)
 
 Adds a distribution.  Note that you'll probably want to add the
-corrisponding packages for that distribution too (it's not done
+corresponding packages for that distribution too (it's not done
 automatically.)
+
+=item distribution_from_prefix($prefix)
+
+Returns a distribution given a prefix.
+
+=item latest_distributions
+
+Returns all the latest distributions:
+
+  my @distributions = $p->latest_distributions;
 
 =cut
 

@@ -6,6 +6,7 @@ CHANGES file for Parse::CPAN::Packages
   - minor code cleanups
   - add human-readable license
   - add an abstract to Makefile.PL
+  - add pod tests, more documentation
 
 2.29 Tue Aug 19 18:37:02 BST 2008
   - parse the preamble and add methods to access the fields
