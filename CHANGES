@@ -4,6 +4,7 @@ CHANGES file for Parse::CPAN::Packages
   - switch to using Moose
   - use Compress::Zlib instead of IO::Zlib for speed
   - minor code cleanups
+  - add human-readable license
 
 2.29 Tue Aug 19 18:37:02 BST 2008
   - parse the preamble and add methods to access the fields
