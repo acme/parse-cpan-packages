@@ -1,6 +1,6 @@
 CHANGES file for Parse::CPAN::Packages
 
-2.30
+2.30 Fri Jan 23 10:09:05 GMT 2009
   - switch to using Moose
   - use Compress::Zlib instead of IO::Zlib for speed
   - minor code cleanups

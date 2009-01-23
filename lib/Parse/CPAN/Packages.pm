@@ -5,7 +5,7 @@ use Compress::Zlib;
 use Parse::CPAN::Packages::Distribution;
 use Parse::CPAN::Packages::Package;
 use version;
-our $VERSION = '2.29';
+our $VERSION = '2.30';
 
 has 'details'     => ( is => 'rw', isa => 'HashRef', default => sub { {} } );
 has 'data'        => ( is => 'rw', isa => 'HashRef', default => sub { {} } );
