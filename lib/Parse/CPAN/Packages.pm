@@ -2,7 +2,6 @@ package Parse::CPAN::Packages;
 use Moose;
 use CPAN::DistnameInfo;
 use Compress::Zlib;
-use IO::Zlib;
 use Parse::CPAN::Packages::Distribution;
 use Parse::CPAN::Packages::Package;
 use version;
@@ -33,9 +32,10 @@ sub _slurp_details {
     if ( $filename =~ /Description:/ ) {
         return $filename;
     } elsif ( $filename =~ /\.gz/ ) {
-        my $fh = IO::Zlib->new( $filename, "rb" )
-            || die "Failed to read $filename: $!";
-        return join '', <$fh>;
+        open( IN, $filename ) || die "Failed to read $filename: $!";
+        my $data = join '', <IN>;
+        close(IN);
+        return Compress::Zlib::memGunzip($data);
     } elsif ( $filename =~ /^\037\213/ ) {
         return Compress::Zlib::memGunzip($filename);
     } else {
@@ -158,20 +158,20 @@ sub _store_distribution {
 }
 
 sub _ensure_latest_distribution {
-    my $self = shift;
+    my $self   = shift;
     my $new    = shift;
-    my $latest    = $self->latest_distribution( $new->dist );
+    my $latest = $self->latest_distribution( $new->dist );
     unless ($latest) {
         $self->_set_latest_distribution($new);
         return;
     }
-    my $new_version = $new->version;
+    my $new_version    = $new->version;
     my $latest_version = $latest->version;
     my ( $newv, $latestv );
 
     eval {
         no warnings;
-        $newv = version->new( $new_version || 0 );
+        $newv    = version->new( $new_version    || 0 );
         $latestv = version->new( $latest_version || 0 );
     };
     if ( $newv && $latestv ) {
