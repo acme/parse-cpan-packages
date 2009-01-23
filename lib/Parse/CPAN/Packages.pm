@@ -26,8 +26,8 @@ sub new {
 
 # read the file into memory and return it
 sub _slurp_details {
-    my $self = shift;
-    my $filename = (@_) ? shift : "02packages.details.txt.gz";
+    my ( $self, $filename ) = @_;
+    $filename ||= '02packages.details.txt.gz';
 
     if ( $filename =~ /Description:/ ) {
         return $filename;
@@ -54,8 +54,8 @@ foreach my $subname (
 }
 
 sub parse {
-    my $self    = shift;
-    my $details = $self->_slurp_details(shift);
+    my ( $self, $filename ) = @_;
+    my $details = $self->_slurp_details($filename);
 
     # read the preamble
     my @details = split "\n", $details;
@@ -78,19 +78,21 @@ sub parse {
 }
 
 sub add_quick {
-    my $self = shift;
-    my ( $package_name, $package_version, $prefix ) = @_;
-
-    # create the package object
-    my $m = Parse::CPAN::Packages::Package->new(
-        { package => $package_name, version => $package_version } );
+    my ( $self, $package_name, $package_version, $prefix ) = @_;
 
     # create a distribution object (or get an existing one)
     my $dist = $self->distribution_from_prefix($prefix);
 
+    # create the package object
+    my $m = Parse::CPAN::Packages::Package->new(
+        {   package      => $package_name,
+            version      => $package_version,
+            distribution => $dist
+        }
+    );
+
     # make the package have the distribion and the distribution
     # have the package.  Yes, this creates a cirtular reference.  eek!
-    $m->distribution($dist);
     $dist->add_package($m);
 
     # record this distribution and package
@@ -99,8 +101,7 @@ sub add_quick {
 }
 
 sub distribution_from_prefix {
-    my $self   = shift;
-    my $prefix = shift;
+    my ( $self, $prefix ) = @_;
 
     # see if we have one of these already and return it if we do.
     my $d = $self->distribution($prefix);
@@ -122,8 +123,7 @@ sub distribution_from_prefix {
 }
 
 sub add_package {
-    my $self    = shift;
-    my $package = shift;
+    my ( $self, $package ) = @_;
 
     # store it
     $self->data->{ $package->package } = $package;
@@ -132,8 +132,7 @@ sub add_package {
 }
 
 sub package {
-    my $self         = shift;
-    my $package_name = shift;
+    my ( $self, $package_name ) = @_;
     return $self->data->{$package_name};
 }
 
@@ -143,23 +142,21 @@ sub packages {
 }
 
 sub add_distribution {
-    my $self = shift;
-    my $dist = shift;
+    my ( $self, $dist ) = @_;
 
     $self->_store_distribution($dist);
     $self->_ensure_latest_distribution($dist);
 }
 
 sub _store_distribution {
-    my $self = shift;
-    my $dist = shift;
+    my ( $self, $dist ) = @_;
 
     $self->dists->{ $dist->prefix } = $dist;
 }
 
 sub _ensure_latest_distribution {
-    my $self   = shift;
-    my $new    = shift;
+    my ( $self, $new ) = @_;
+
     my $latest = $self->latest_distribution( $new->dist );
     unless ($latest) {
         $self->_set_latest_distribution($new);
@@ -187,8 +184,7 @@ sub _ensure_latest_distribution {
 }
 
 sub distribution {
-    my $self = shift;
-    my $dist = shift;
+    my ( $self, $dist ) = @_;
     return $self->dists->{$dist};
 }
 
@@ -198,15 +194,13 @@ sub distributions {
 }
 
 sub _set_latest_distribution {
-    my $self = shift;
-    my $dist = shift;
+    my ( $self, $dist ) = @_;
     return unless $dist->dist;
     $self->latestdists->{ $dist->dist } = $dist;
 }
 
 sub latest_distribution {
-    my $self = shift;
-    my $dist = shift;
+    my ( $self, $dist ) = @_;
     return unless $dist;
     return $self->latestdists->{$dist};
 }
