@@ -1,16 +1,12 @@
 package Parse::CPAN::Packages::Package;
-use strict;
-use base qw( Class::Accessor::Fast );
-__PACKAGE__->mk_accessors(qw( package version prefix distribution ));
-use Parse::CPAN::Packages::Distribution;
+use Moose;
 
-sub new {
-    my $class = shift;
+has 'package' => ( is => 'rw', isa => 'Str' );
+has 'version' => ( is => 'rw', isa => 'Str' );
+has 'prefix'  => ( is => 'rw', isa => 'Str' );
+has 'distribution' =>
+    ( is => 'rw', isa => 'Parse::CPAN::Packages::Distribution' );
 
-    my $self = {};
-    bless $self, $class;
-
-    return $self;
-}
+__PACKAGE__->meta->make_immutable;
 
 1;

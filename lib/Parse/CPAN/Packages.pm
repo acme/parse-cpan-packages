@@ -1,23 +1,26 @@
 package Parse::CPAN::Packages;
-use strict;
-use base qw( Class::Accessor::Fast );
-__PACKAGE__->mk_accessors(qw( details data dists latestdists ));
+use Moose;
 use CPAN::DistnameInfo;
 use Compress::Zlib;
 use IO::Zlib;
+use Parse::CPAN::Packages::Distribution;
 use Parse::CPAN::Packages::Package;
 use version;
-use vars qw($VERSION);
-$VERSION = '2.29';
+our $VERSION = '2.29';
+
+has 'details'     => ( is => 'rw', isa => 'HashRef', default => sub { {} } );
+has 'data'        => ( is => 'rw', isa => 'HashRef', default => sub { {} } );
+has 'dists'       => ( is => 'rw', isa => 'HashRef', default => sub { {} } );
+has 'latestdists' => ( is => 'rw', isa => 'HashRef', default => sub { {} } );
+
+__PACKAGE__->meta->make_immutable;
 
 sub new {
-    my $class = shift;
-
-    my $self = { data => {}, dists => {}, latestdists => {}, preamble => {} };
-    bless $self, $class;
+    my ( $class, $filename ) = @_;
+    my $self = $class->SUPER::new();
 
     # read the file then parse it if present
-    $self->parse(shift) if @_;
+    $self->parse($filename) if $filename;
 
     return $self;
 }
@@ -79,9 +82,8 @@ sub add_quick {
     my ( $package_name, $package_version, $prefix ) = @_;
 
     # create the package object
-    my $m = Parse::CPAN::Packages::Package->new;
-    $m->package($package_name);
-    $m->version($package_version);
+    my $m = Parse::CPAN::Packages::Package->new(
+        { package => $package_name, version => $package_version } );
 
     # create a distribution object (or get an existing one)
     my $dist = $self->distribution_from_prefix($prefix);
@@ -105,15 +107,17 @@ sub distribution_from_prefix {
     return $d if $d;
 
     # create a new one otherwise
-    $d = Parse::CPAN::Packages::Distribution->new;
     my $i = CPAN::DistnameInfo->new($prefix);
-    $d->prefix($prefix);
-    $d->dist( $i->dist );
-    $d->version( $i->version );
-    $d->maturity( $i->maturity );
-    $d->filename( $i->filename );
-    $d->cpanid( $i->cpanid );
-    $d->distvname( $i->distvname );
+    $d = Parse::CPAN::Packages::Distribution->new(
+        {   prefix    => $prefix,
+            dist      => $i->dist,
+            version   => $i->version,
+            maturity  => $i->maturity,
+            filename  => $i->filename,
+            cpanid    => $i->cpanid,
+            distvname => $i->distvname
+        }
+    );
     return $d;
 }
 
@@ -155,25 +159,29 @@ sub _store_distribution {
 
 sub _ensure_latest_distribution {
     my $self = shift;
-    local $a = shift;
-    local $b = $self->latest_distribution( $a->dist );
-    unless ($b) {
-        $self->_set_latest_distribution($a);
+    my $new    = shift;
+    my $latest    = $self->latest_distribution( $new->dist );
+    unless ($latest) {
+        $self->_set_latest_distribution($new);
         return;
     }
-    my ( $av, $bv );
-    local $^W = 0;    # stop version.pm warnings
+    my $new_version = $new->version;
+    my $latest_version = $latest->version;
+    my ( $newv, $latestv );
+
     eval {
-        $av = version->new( $a->version || 0 );
-        $bv = version->new( $b->version || 0 );
+        no warnings;
+        $newv = version->new( $new_version || 0 );
+        $latestv = version->new( $latest_version || 0 );
     };
-    if ( $av && $bv ) {
-        if ( $av > $bv ) {
-            $self->_set_latest_distribution($a);
+    if ( $newv && $latestv ) {
+        if ( $newv > $latestv ) {
+            $self->_set_latest_distribution($new);
         }
     } else {
-        if ( $a->dist > $b->dist ) {
-            $self->_set_latest_distribution($a);
+        no warnings;
+        if ( $new_version > $latest_version ) {
+            $self->_set_latest_distribution($new);
         }
     }
 }

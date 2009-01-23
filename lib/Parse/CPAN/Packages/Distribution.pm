@@ -1,17 +1,16 @@
 package Parse::CPAN::Packages::Distribution;
-use strict;
-use base qw( Class::Accessor::Fast );
-__PACKAGE__->mk_accessors(
-    qw( prefix dist version maturity filename
-        cpanid distvname packages )
-);
+use Moose;
 
-sub new {
-    my $class = shift;
-    my $self  = $class->SUPER::new;
-    $self->packages( [] );
-    return $self;
-}
+has 'prefix'    => ( is => 'rw', isa => 'Str' );
+has 'dist'      => ( is => 'rw', isa => 'Str|Undef' );
+has 'version'   => ( is => 'rw', isa => 'Str|Undef' );
+has 'maturity'  => ( is => 'rw', isa => 'Str' );
+has 'filename'  => ( is => 'rw', isa => 'Str' );
+has 'cpanid'    => ( is => 'rw', isa => 'Str' );
+has 'distvname' => ( is => 'rw', isa => 'Str|Undef' );
+has 'packages'  => ( is => 'rw', isa => 'ArrayRef', default => sub { [] } );
+
+__PACKAGE__->meta->make_immutable;
 
 sub contains {
     my $self = shift;
